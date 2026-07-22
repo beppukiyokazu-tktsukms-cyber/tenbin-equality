@@ -235,7 +235,7 @@ details.rules-toggle summary{cursor:pointer;font-family:'M PLUS Rounded 1c';font
     </svg>
     <div class="hero-text">
       <h1>てんびんで学ぶ 等式の性質</h1>
-      <p>上皿てんびんの両方の皿に同じ操作をすると、はりはまん中のままです。x の重さを調べよう！</p>
+      <p>上皿てんびんの両方の皿に同じ操作をすると、はりはまん中のまま。x のねだんを見つけよう！</p>
     </div>
     <div class="hero-badge">中学1年 数学</div>
   </div>
@@ -244,7 +244,7 @@ details.rules-toggle summary{cursor:pointer;font-family:'M PLUS Rounded 1c';font
     <div class="main-col">
 
       <div class="card">
-        <h2><span class="num">1</span>もんだいをえらぶ（全12問）</h2>
+        <h2><span class="num">1</span>もんだいをえらぶ（全16問）</h2>
         <div class="problem-chips" id="problemChips"></div>
       </div>
 
@@ -464,15 +464,19 @@ const problems = [
   {tier:'★1 きほん', label:'x + 3 = 7', stars:1, coeffNum:1, coeffDen:1, leftConst:3, rightConst:7, xValue:4, hint:'両辺から 3 をひいてみよう。'},
   {tier:'★1 きほん', label:'x − 4 = 2', stars:1, coeffNum:1, coeffDen:1, leftConst:-4, rightConst:2, xValue:6, hint:'両辺に 4 をたしてみよう。'},
   {tier:'★1 きほん', label:'x + 6 = 9', stars:1, coeffNum:1, coeffDen:1, leftConst:6, rightConst:9, xValue:3, hint:'両辺から 6 をひいてみよう。'},
+  {tier:'★1 きほん', label:'x + 2 = 10', stars:1, coeffNum:1, coeffDen:1, leftConst:2, rightConst:10, xValue:8, hint:'両辺から 2 をひいてみよう。'},
   {tier:'★2 マイナスに挑戦', label:'x + 5 = 2', stars:2, coeffNum:1, coeffDen:1, leftConst:5, rightConst:2, xValue:-3, hint:'両辺から 5 をひいてみよう。答えはマイナスになるよ。'},
   {tier:'★2 マイナスに挑戦', label:'x − 6 = −2', stars:2, coeffNum:1, coeffDen:1, leftConst:-6, rightConst:-2, xValue:4, hint:'両辺に 6 をたしてみよう。'},
   {tier:'★2 マイナスに挑戦', label:'3x = 12', stars:2, coeffNum:3, coeffDen:1, leftConst:0, rightConst:12, xValue:4, hint:'両辺を 3 でわってみよう。'},
+  {tier:'★2 マイナスに挑戦', label:'x − 3 = −5', stars:2, coeffNum:1, coeffDen:1, leftConst:-3, rightConst:-5, xValue:-2, hint:'両辺に 3 をたしてみよう。答えはマイナスになるよ。'},
   {tier:'★3 かけ算・わり算', label:'x ÷ 4 = 3', stars:3, coeffNum:1, coeffDen:4, leftConst:0, rightConst:3, xValue:12, hint:'両辺に 4 をかけてみよう。'},
   {tier:'★3 かけ算・わり算', label:'5x = −15', stars:3, coeffNum:5, coeffDen:1, leftConst:0, rightConst:-15, xValue:-3, hint:'両辺を 5 でわってみよう。答えはマイナスになるよ。'},
   {tier:'★3 かけ算・わり算', label:'2x + 3 = 11', stars:3, coeffNum:2, coeffDen:1, leftConst:3, rightConst:11, xValue:4, hint:'まず両辺から 3 をひいて、それから 2 でわろう。'},
+  {tier:'★3 かけ算・わり算', label:'4x = 20', stars:3, coeffNum:4, coeffDen:1, leftConst:0, rightConst:20, xValue:5, hint:'両辺を 4 でわってみよう。'},
   {tier:'★4 2段階チャレンジ', label:'4x − 5 = 7', stars:4, coeffNum:4, coeffDen:1, leftConst:-5, rightConst:7, xValue:3, hint:'まず両辺に 5 をたして、それから 4 でわろう。'},
   {tier:'★4 2段階チャレンジ', label:'3x + 8 = 2', stars:4, coeffNum:3, coeffDen:1, leftConst:8, rightConst:2, xValue:-2, hint:'まず両辺から 8 をひいて、それから 3 でわろう。答えはマイナスになるよ。'},
-  {tier:'★4 2段階チャレンジ', label:'x ÷ 3 − 1 = 1', stars:4, coeffNum:1, coeffDen:3, leftConst:-1, rightConst:1, xValue:6, hint:'まず両辺に 1 をたして、それから 3 をかけよう。'}
+  {tier:'★4 2段階チャレンジ', label:'x ÷ 3 − 1 = 1', stars:4, coeffNum:1, coeffDen:3, leftConst:-1, rightConst:1, xValue:6, hint:'まず両辺に 1 をたして、それから 3 をかけよう。'},
+  {tier:'★4 2段階チャレンジ', label:'x ÷ 2 + 1 = 4', stars:4, coeffNum:1, coeffDen:2, leftConst:1, rightConst:4, xValue:6, hint:'まず両辺から 1 をひいて、それから 2 をかけよう。'}
 ];
 
 let state = {};
@@ -636,7 +640,13 @@ function renderProblemChips(){
 }
 
 function checkSolved(){
-  const isSolved = (state.coeffNum === 1 && state.coeffDen === 1 && state.leftConst === 0);
+  // 「x = 数」の形になっただけでなく、実際にてんびんが釣り合っている
+  // （右辺の値が本当の x の値と一致している）ことも確認する。
+  // 実験モードで片方だけ操作すると、見た目は x = 数 の形でも
+  // 式が崩れている（釣り合っていない）ことがあるため。
+  const isFormSolved = (state.coeffNum === 1 && state.coeffDen === 1 && state.leftConst === 0);
+  const isBalanced = Math.abs(state.rightConst - state.xValue) < 1e-9;
+  const isSolved = isFormSolved && isBalanced;
   const banner = document.getElementById('solvedBanner');
   if(isSolved){
     solvedSet.add(state.idx);
