@@ -235,7 +235,7 @@ details.rules-toggle summary{cursor:pointer;font-family:'M PLUS Rounded 1c';font
     </svg>
     <div class="hero-text">
       <h1>てんびんで学ぶ 等式の性質</h1>
-      <p>上皿てんびんの両方の皿に同じ操作をすると、はりはまん中のまま。x のねだんを見つけよう！</p>
+      <p>上皿てんびんの両方の皿に同じ操作をすると、はりはまん中のまま。x の重さを見つけよう！</p>
     </div>
     <div class="hero-badge">中学1年 数学</div>
   </div>
@@ -244,7 +244,7 @@ details.rules-toggle summary{cursor:pointer;font-family:'M PLUS Rounded 1c';font
     <div class="main-col">
 
       <div class="card">
-        <h2><span class="num">1</span>もんだいをえらぶ（全16問）</h2>
+        <h2><span class="num">1</span>もんだいをえらぶ（全20問）</h2>
         <div class="problem-chips" id="problemChips"></div>
       </div>
 
@@ -339,22 +339,22 @@ function svgEl(name, attrs){
 }
 function clearGroup(g){ while(g.firstChild) g.removeChild(g.firstChild); }
 
-const PIVOT = {x:450, y:230};
+const PIVOT = {x:450, y:315};
 const HALF_LEN = 205;
-const POST_H = 78;      // vertical post from beam end up to pan
-const NEEDLE_LEN = 92;
+const POST_H = 50;      // vertical post from beam end up to pan
+const NEEDLE_LEN = 88;
 
 const svg = svgEl('svg', {viewBox:'0 0 900 560', width:'100%', height:'auto', 'aria-hidden':'true'});
 document.getElementById('svgHolder').appendChild(svg);
 
 /* ground shadow */
-svg.appendChild(svgEl('ellipse', {cx:450, cy:512, rx:190, ry:13, fill:'#5D6B82', opacity:'0.14'}));
+svg.appendChild(svgEl('ellipse', {cx:450, cy:440, rx:110, ry:11, fill:'#5D6B82', opacity:'0.14'}));
 
-/* stand: stout pedestal below pivot */
+/* stand: compact pedestal below pivot */
 const stand = svgEl('g', {});
-stand.appendChild(svgEl('path', {d:'M 450 240 L 424 500 L 476 500 Z', fill:'#8A97AC'}));
-stand.appendChild(svgEl('path', {d:'M 450 240 L 424 500 L 476 500 Z', fill:'none', stroke:'#5D6B82', 'stroke-width':'2.5'}));
-stand.appendChild(svgEl('rect', {x:390, y:495, width:120, height:16, rx:6, fill:'#5D6B82'}));
+stand.appendChild(svgEl('path', {d:'M 450 317 L 421 425 L 479 425 Z', fill:'#8A97AC'}));
+stand.appendChild(svgEl('path', {d:'M 450 317 L 421 425 L 479 425 Z', fill:'none', stroke:'#5D6B82', 'stroke-width':'2.5'}));
+stand.appendChild(svgEl('rect', {x:405, y:423, width:90, height:14, rx:5, fill:'#5D6B82'}));
 svg.appendChild(stand);
 
 /* dial arc (fixed, decorative) mounted above pivot */
@@ -446,14 +446,14 @@ function fillPanBlocks(panRefs, items){
   clearGroup(panRefs.below);
   let ai = 0;
   items.above.forEach(item=>{
-    const y = -34 - ai*56;
+    const y = -28 - ai*48;
     panRefs.above.appendChild(makeBlock(0, y, item.kind, item.label, item.badge));
     ai++;
   });
   let bi = 0;
   items.below.forEach(item=>{
-    const y = 40 + bi*54;
-    panRefs.below.appendChild(svgEl('line', {x1:0, y1: bi===0?10:(40+(bi-1)*54+26), x2:0, y2:y-26, stroke:'#D9534F', 'stroke-width':'2', 'stroke-dasharray':'3,3'}));
+    const y = 40 + bi*50;
+    panRefs.below.appendChild(svgEl('line', {x1:0, y1: bi===0?10:(40+(bi-1)*50+24), x2:0, y2:y-24, stroke:'#D9534F', 'stroke-width':'2', 'stroke-dasharray':'3,3'}));
     panRefs.below.appendChild(makeBlock(0, y, 'neg', item.label, null));
     bi++;
   });
@@ -465,18 +465,22 @@ const problems = [
   {tier:'★1 きほん', label:'x − 4 = 2', stars:1, coeffNum:1, coeffDen:1, leftConst:-4, rightConst:2, xValue:6, hint:'両辺に 4 をたしてみよう。'},
   {tier:'★1 きほん', label:'x + 6 = 9', stars:1, coeffNum:1, coeffDen:1, leftConst:6, rightConst:9, xValue:3, hint:'両辺から 6 をひいてみよう。'},
   {tier:'★1 きほん', label:'x + 2 = 10', stars:1, coeffNum:1, coeffDen:1, leftConst:2, rightConst:10, xValue:8, hint:'両辺から 2 をひいてみよう。'},
+  {tier:'★1 きほん', label:'x + 4 = 11', stars:1, coeffNum:1, coeffDen:1, leftConst:4, rightConst:11, xValue:7, hint:'両辺から 4 をひいてみよう。'},
   {tier:'★2 マイナスに挑戦', label:'x + 5 = 2', stars:2, coeffNum:1, coeffDen:1, leftConst:5, rightConst:2, xValue:-3, hint:'両辺から 5 をひいてみよう。答えはマイナスになるよ。'},
   {tier:'★2 マイナスに挑戦', label:'x − 6 = −2', stars:2, coeffNum:1, coeffDen:1, leftConst:-6, rightConst:-2, xValue:4, hint:'両辺に 6 をたしてみよう。'},
   {tier:'★2 マイナスに挑戦', label:'3x = 12', stars:2, coeffNum:3, coeffDen:1, leftConst:0, rightConst:12, xValue:4, hint:'両辺を 3 でわってみよう。'},
   {tier:'★2 マイナスに挑戦', label:'x − 3 = −5', stars:2, coeffNum:1, coeffDen:1, leftConst:-3, rightConst:-5, xValue:-2, hint:'両辺に 3 をたしてみよう。答えはマイナスになるよ。'},
+  {tier:'★2 マイナスに挑戦', label:'x + 8 = 3', stars:2, coeffNum:1, coeffDen:1, leftConst:8, rightConst:3, xValue:-5, hint:'両辺から 8 をひいてみよう。答えはマイナスになるよ。'},
   {tier:'★3 かけ算・わり算', label:'x ÷ 4 = 3', stars:3, coeffNum:1, coeffDen:4, leftConst:0, rightConst:3, xValue:12, hint:'両辺に 4 をかけてみよう。'},
   {tier:'★3 かけ算・わり算', label:'5x = −15', stars:3, coeffNum:5, coeffDen:1, leftConst:0, rightConst:-15, xValue:-3, hint:'両辺を 5 でわってみよう。答えはマイナスになるよ。'},
   {tier:'★3 かけ算・わり算', label:'2x + 3 = 11', stars:3, coeffNum:2, coeffDen:1, leftConst:3, rightConst:11, xValue:4, hint:'まず両辺から 3 をひいて、それから 2 でわろう。'},
   {tier:'★3 かけ算・わり算', label:'4x = 20', stars:3, coeffNum:4, coeffDen:1, leftConst:0, rightConst:20, xValue:5, hint:'両辺を 4 でわってみよう。'},
+  {tier:'★3 かけ算・わり算', label:'6x = 18', stars:3, coeffNum:6, coeffDen:1, leftConst:0, rightConst:18, xValue:3, hint:'両辺を 6 でわってみよう。'},
   {tier:'★4 2段階チャレンジ', label:'4x − 5 = 7', stars:4, coeffNum:4, coeffDen:1, leftConst:-5, rightConst:7, xValue:3, hint:'まず両辺に 5 をたして、それから 4 でわろう。'},
   {tier:'★4 2段階チャレンジ', label:'3x + 8 = 2', stars:4, coeffNum:3, coeffDen:1, leftConst:8, rightConst:2, xValue:-2, hint:'まず両辺から 8 をひいて、それから 3 でわろう。答えはマイナスになるよ。'},
   {tier:'★4 2段階チャレンジ', label:'x ÷ 3 − 1 = 1', stars:4, coeffNum:1, coeffDen:3, leftConst:-1, rightConst:1, xValue:6, hint:'まず両辺に 1 をたして、それから 3 をかけよう。'},
-  {tier:'★4 2段階チャレンジ', label:'x ÷ 2 + 1 = 4', stars:4, coeffNum:1, coeffDen:2, leftConst:1, rightConst:4, xValue:6, hint:'まず両辺から 1 をひいて、それから 2 をかけよう。'}
+  {tier:'★4 2段階チャレンジ', label:'x ÷ 2 + 1 = 4', stars:4, coeffNum:1, coeffDen:2, leftConst:1, rightConst:4, xValue:6, hint:'まず両辺から 1 をひいて、それから 2 をかけよう。'},
+  {tier:'★4 2段階チャレンジ', label:'2x − 7 = −1', stars:4, coeffNum:2, coeffDen:1, leftConst:-7, rightConst:-1, xValue:3, hint:'まず両辺に 7 をたして、それから 2 でわろう。'}
 ];
 
 let state = {};
@@ -577,7 +581,7 @@ function animateTilt(target){
 function rebuildBlocks(){
   const leftItems = {above:[], below:[]};
   if(state.coeffDen === 1 && state.coeffNum > 0){
-    if(state.coeffNum <= 4){ for(let i=0;i<state.coeffNum;i++) leftItems.above.push({kind:'x', label:'x'}); }
+    if(state.coeffNum <= 3){ for(let i=0;i<state.coeffNum;i++) leftItems.above.push({kind:'x', label:'x'}); }
     else leftItems.above.push({kind:'x', label:'x', badge:`×${state.coeffNum}`});
   } else if(state.coeffDen > 1){
     const lbl = state.coeffNum === 1 ? `x÷${state.coeffDen}` : `${state.coeffNum}x÷${state.coeffDen}`;
