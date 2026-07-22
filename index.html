@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>てんびんで学ぶ 等式の性質</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+
+:root{
+  --bg:#FBF7EC;
+  --grid:#E4EEF5;
+  --ink:#26324A;
+  --ink-soft:#66738F;
+  --brass:#E0B15C;
+  --brass-dark:#B4812A;
+  --brass-light:#F3D693;
+  --wood:#8B5A2B;
+  --wood-dark:#6B4423;
+  --steel:#8A97AC;
+  --steel-dark:#5D6B82;
+  --x-color:#7C6CF0;
+  --x-color-dark:#5A48C9;
+  --good:#3F9A67;
+  --good-bg:#E4F4EA;
+  --bad:#D9534F;
+  --bad-bg:#FBE9E7;
+  --card:#FFFFFF;
+  --line:#E7DFCB;
+  --shadow: 0 8px 24px rgba(74,58,20,0.10);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0/100% 34px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/34px 100%,
+    var(--bg);
+  color:var(--ink);
+  font-family:'Zen Maru Gothic', sans-serif;
+  min-height:100vh;
+  padding:20px 16px 60px;
+}
+
+h1,h2,h3, .display{ font-family:'M PLUS Rounded 1c', sans-serif; }
+
+.app-shell{max-width:1180px;margin:0 auto;}
+
+/* ---------- header ---------- */
+.hero{
+  display:flex;align-items:center;gap:16px;
+  background:var(--card);border:1px solid var(--line);border-radius:20px;
+  padding:18px 24px;box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;
+}
+.hero-icon{flex:0 0 auto;width:54px;height:54px;}
+.hero-text{flex:1 1 260px;}
+.hero-text h1{margin:0;font-size:1.5rem;font-weight:800;color:var(--ink);}
+.hero-text p{margin:4px 0 0;color:var(--ink-soft);font-size:0.92rem;}
+.hero-badge{
+  font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.78rem;
+  background:var(--brass-light);color:var(--wood-dark);padding:6px 12px;border-radius:999px;white-space:nowrap;
+}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start;}
+@media (max-width:940px){.layout{grid-template-columns:1fr;}}
+
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:20px;
+  padding:20px 22px;box-shadow:var(--shadow);margin-bottom:18px;
+}
+.card h2{font-size:1.05rem;margin:0 0 12px;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.card h2 .num{
+  width:26px;height:26px;border-radius:50%;background:var(--brass);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;
+}
+
+/* ---------- problem chips ---------- */
+.tier-label{
+  font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.76rem;color:var(--ink-soft);
+  margin:10px 0 6px;letter-spacing:0.5px;
+}
+.tier-label:first-child{margin-top:0;}
+.problem-chips{display:flex;flex-wrap:wrap;gap:9px;max-height:250px;overflow-y:auto;padding-right:4px;}
+.chip{
+  border:2px solid var(--line);background:#fff;border-radius:14px;padding:8px 13px;cursor:pointer;
+  font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.88rem;color:var(--ink-soft);
+  transition:all .15s;text-align:left;
+}
+.chip .stars{display:block;font-size:0.7rem;color:var(--brass-dark);margin-top:2px;font-weight:500;}
+.chip:hover{border-color:var(--brass);transform:translateY(-1px);}
+.chip.active{background:var(--x-color);border-color:var(--x-color-dark);color:#fff;box-shadow:0 4px 10px rgba(90,72,201,0.3);}
+.chip.active .stars{color:#EDE9FF;}
+.chip.solved::after{content:" ✓";color:var(--good);}
+.chip.active.solved::after{color:#D8FFE9;}
+
+/* ---------- balance ---------- */
+.balance-wrap{display:flex;flex-direction:column;align-items:center;}
+.balance-svg-holder{width:100%;max-width:640px;}
+.status-badge{
+  font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.85rem;
+  padding:6px 16px;border-radius:999px;margin-top:2px;transition:all .3s;
+}
+.status-balanced{background:var(--good-bg);color:var(--good);}
+.status-tilt{background:var(--bad-bg);color:var(--bad);}
+
+.equation-display{
+  text-align:center;margin:14px 0 4px;font-family:'M PLUS Rounded 1c';font-weight:800;
+  font-size:clamp(1.6rem,4.6vw,2.3rem);color:var(--ink);letter-spacing:0.5px;
+}
+.equation-display .eq-sign{color:var(--brass-dark);margin:0 10px;}
+.equation-display .x-part{color:var(--x-color-dark);}
+
+.solved-banner{
+  display:none;text-align:center;background:linear-gradient(135deg,var(--good-bg),#fff);
+  border:2px dashed var(--good);border-radius:16px;padding:14px;margin-top:10px;color:var(--good);
+  font-family:'M PLUS Rounded 1c';font-weight:800;font-size:1.05rem;
+}
+.solved-banner.show{display:block;animation:pop .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{0%{transform:scale(.85);opacity:0;}100%{transform:scale(1);opacity:1;}}
+
+/* ---------- controls ---------- */
+.mode-toggle-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.switch{position:relative;width:52px;height:28px;flex:0 0 auto;}
+.switch input{opacity:0;width:0;height:0;}
+.switch .track{position:absolute;inset:0;background:var(--good);border-radius:999px;cursor:pointer;transition:.25s;}
+.switch .track::before{
+  content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:.25s;box-shadow:0 2px 4px rgba(0,0,0,0.2);
+}
+.switch input:checked + .track{background:var(--bad);}
+.switch input:checked + .track::before{transform:translateX(24px);}
+.mode-label{font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.88rem;}
+.mode-label small{display:block;font-weight:500;color:var(--ink-soft);font-size:0.76rem;}
+
+.side-picker{display:none;gap:8px;margin-bottom:14px;}
+.side-picker.show{display:flex;}
+.side-picker label{
+  border:2px solid var(--bad);color:var(--bad);border-radius:10px;padding:6px 12px;
+  font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.85rem;cursor:pointer;
+}
+.side-picker input{margin-right:6px;}
+.side-picker label:has(input:checked){background:var(--bad);color:#fff;}
+
+.n-stepper{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.n-stepper span.lbl{font-size:0.88rem;color:var(--ink-soft);font-weight:500;}
+.n-stepper button{
+  width:32px;height:32px;border-radius:10px;border:2px solid var(--line);background:#fff;
+  font-size:1.1rem;font-weight:700;cursor:pointer;color:var(--ink);
+}
+.n-stepper input{
+  width:56px;text-align:center;font-family:'M PLUS Rounded 1c';font-weight:800;
+  font-size:1.1rem;border:2px solid var(--line);border-radius:10px;padding:5px 2px;color:var(--ink);
+}
+
+.op-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media (max-width:520px){.op-grid{grid-template-columns:repeat(2,1fr);}}
+.op-btn{
+  font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.95rem;padding:12px 6px;border-radius:14px;
+  border:none;cursor:pointer;color:#fff;background:linear-gradient(160deg,var(--x-color),var(--x-color-dark));
+  box-shadow:0 4px 0 var(--x-color-dark);transition:transform .1s;
+}
+.op-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--x-color-dark);}
+.op-grid.experiment .op-btn{background:linear-gradient(160deg,#F0837A,var(--bad));box-shadow:0 4px 0 #B84440;}
+.op-grid.experiment .op-btn:active{box-shadow:0 1px 0 #B84440;}
+
+.util-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.util-btn{
+  font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.85rem;padding:9px 16px;border-radius:12px;
+  border:2px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;
+}
+.util-btn:hover{border-color:var(--brass);color:var(--wood-dark);}
+
+.hint-btn{margin-top:10px;}
+.hint-box{
+  display:none;margin-top:10px;background:#FFF8E8;border:1.5px dashed var(--brass-dark);
+  border-radius:12px;padding:10px 14px;font-size:0.88rem;color:var(--wood-dark);
+}
+.hint-box.show{display:block;}
+
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--ink);color:#fff;
+  padding:11px 20px;border-radius:999px;font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.88rem;
+  opacity:0;pointer-events:none;transition:all .3s;z-index:50;box-shadow:0 8px 20px rgba(0,0,0,0.25);
+  max-width:90vw;text-align:center;
+}
+.toast.warn{background:var(--bad);}
+.toast.good{background:var(--good);}
+.toast.show{opacity:1;transform:translate(-50%,0);}
+
+/* ---------- history ---------- */
+.history-list{list-style:none;margin:0;padding:0;max-height:260px;overflow-y:auto;}
+.history-list li{font-size:0.86rem;padding:8px 0;border-bottom:1px dashed var(--line);display:flex;flex-direction:column;gap:2px;}
+.history-list li:last-child{border-bottom:none;}
+.history-list .heq{font-family:'M PLUS Rounded 1c';font-weight:700;color:var(--ink);}
+.history-list .hnote{font-size:0.74rem;color:var(--ink-soft);}
+.history-list li.exp .heq{color:var(--bad);}
+.history-list li.exp .hnote{color:var(--bad);}
+
+/* ---------- rules ---------- */
+.rule-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);}
+.rule-item:last-child{border-bottom:none;}
+.rule-icon{
+  flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:var(--brass-light);
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--wood-dark);
+  font-family:'M PLUS Rounded 1c';font-size:0.95rem;
+}
+.rule-formula{font-family:'M PLUS Rounded 1c';font-weight:700;font-size:0.92rem;color:var(--ink);}
+.rule-desc{font-size:0.8rem;color:var(--ink-soft);margin-top:2px;}
+details.rules-toggle summary{cursor:pointer;font-family:'M PLUS Rounded 1c';font-weight:700;color:var(--wood-dark);}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:0.78rem;color:var(--ink-soft);margin-top:10px;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block;}
+.legend .i-x{background:var(--x-color);}
+.legend .i-num{background:var(--brass);}
+.legend .i-neg{background:var(--bad);}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="hero">
+    <svg class="hero-icon" viewBox="0 0 64 64">
+      <g fill="none" stroke="#8A97AC" stroke-width="3" stroke-linecap="round">
+        <line x1="32" y1="46" x2="32" y2="14"/><line x1="12" y1="30" x2="52" y2="30"/>
+      </g>
+      <rect x="24" y="48" width="16" height="6" rx="2" fill="#6B4423"/>
+      <circle cx="32" cy="30" r="4" fill="#B4812A"/>
+      <line x1="12" y1="30" x2="12" y2="18" stroke="#8A97AC" stroke-width="3" stroke-linecap="round"/>
+      <line x1="52" y1="30" x2="52" y2="18" stroke="#8A97AC" stroke-width="3" stroke-linecap="round"/>
+      <ellipse cx="12" cy="16" rx="11" ry="4" fill="#F3D693" stroke="#B4812A" stroke-width="2"/>
+      <ellipse cx="52" cy="16" rx="11" ry="4" fill="#F3D693" stroke="#B4812A" stroke-width="2"/>
+    </svg>
+    <div class="hero-text">
+      <h1>てんびんで学ぶ 等式の性質</h1>
+      <p>上皿てんびんの両方の皿に同じ操作をすると、はりはまん中のままです。x の重さを調べよう！</p>
+    </div>
+    <div class="hero-badge">中学1年 数学</div>
+  </div>
+
+  <div class="layout">
+    <div class="main-col">
+
+      <div class="card">
+        <h2><span class="num">1</span>もんだいをえらぶ（全12問）</h2>
+        <div class="problem-chips" id="problemChips"></div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num">2</span>てんびんを操作する</h2>
+        <div class="balance-wrap">
+          <div class="balance-svg-holder" id="svgHolder"></div>
+          <div class="status-badge status-balanced" id="statusBadge">つりあっている</div>
+          <div class="equation-display" id="eqDisplay"></div>
+          <div class="solved-banner" id="solvedBanner">🎉 せいかい！ x のねだんが わかったね！</div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--line);margin:18px 0;">
+
+        <div class="mode-toggle-row">
+          <label class="switch">
+            <input type="checkbox" id="modeSwitch">
+            <span class="track"></span>
+          </label>
+          <span class="mode-label" id="modeLabel">両辺モード<small>両辺に同じ操作をする（安全）</small></span>
+        </div>
+
+        <div class="side-picker" id="sidePicker">
+          <label><input type="radio" name="side" value="left" checked><span>左の皿だけ</span></label>
+          <label><input type="radio" name="side" value="right"><span>右の皿だけ</span></label>
+        </div>
+
+        <div class="n-stepper">
+          <span class="lbl">同じ数：</span>
+          <button type="button" id="nMinus">－</button>
+          <input type="number" id="opN" value="3" min="1" max="20">
+          <button type="button" id="nPlus">＋</button>
+        </div>
+
+        <div class="op-grid" id="opGrid">
+          <button class="op-btn" data-op="add">＋ たす</button>
+          <button class="op-btn" data-op="sub">－ ひく</button>
+          <button class="op-btn" data-op="mul">× かける</button>
+          <button class="op-btn" data-op="div">÷ わる</button>
+        </div>
+
+        <div class="util-row">
+          <button class="util-btn" id="undoBtn">↩ ひとつ戻る</button>
+          <button class="util-btn" id="resetBtn">⟲ この問題をリセット</button>
+          <button class="util-btn hint-btn" id="hintBtn">💡 ヒントを見る</button>
+        </div>
+        <div class="hint-box" id="hintBox"></div>
+
+        <div class="legend">
+          <span><i class="i-x"></i>x の箱（重さはひみつ）</span>
+          <span><i class="i-num"></i>数字のおもり</span>
+          <span><i class="i-neg"></i>マイナスのおもり（ぶらさげて軽くする）</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="side-col">
+      <div class="card">
+        <h2>📜 ステップの記録</h2>
+        <ul class="history-list" id="historyList"></ul>
+      </div>
+
+      <div class="card">
+        <details class="rules-toggle" open>
+          <summary>📐 等式の性質（まとめ）</summary>
+          <div style="margin-top:10px;">
+            <div class="rule-item"><div class="rule-icon">＋</div>
+              <div><div class="rule-formula">A = B ならば A+C = B+C</div><div class="rule-desc">両辺に同じ数をたしても、等式は成り立つ</div></div></div>
+            <div class="rule-item"><div class="rule-icon">－</div>
+              <div><div class="rule-formula">A = B ならば A−C = B−C</div><div class="rule-desc">両辺から同じ数をひいても、等式は成り立つ</div></div></div>
+            <div class="rule-item"><div class="rule-icon">×</div>
+              <div><div class="rule-formula">A = B ならば A×C = B×C</div><div class="rule-desc">両辺に同じ数をかけても、等式は成り立つ</div></div></div>
+            <div class="rule-item"><div class="rule-icon">÷</div>
+              <div><div class="rule-formula">A = B ならば A÷C = B÷C（C≠0）</div><div class="rule-desc">両辺を同じ数（0でない）でわっても、等式は成り立つ</div></div></div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ SVG SETUP: 上皿天秤 ============ */
+const SVGNS = "http://www.w3.org/2000/svg";
+function svgEl(name, attrs){
+  const el = document.createElementNS(SVGNS, name);
+  for(const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+function clearGroup(g){ while(g.firstChild) g.removeChild(g.firstChild); }
+
+const PIVOT = {x:450, y:230};
+const HALF_LEN = 205;
+const POST_H = 78;      // vertical post from beam end up to pan
+const NEEDLE_LEN = 92;
+
+const svg = svgEl('svg', {viewBox:'0 0 900 560', width:'100%', height:'auto', 'aria-hidden':'true'});
+document.getElementById('svgHolder').appendChild(svg);
+
+/* ground shadow */
+svg.appendChild(svgEl('ellipse', {cx:450, cy:512, rx:190, ry:13, fill:'#5D6B82', opacity:'0.14'}));
+
+/* stand: stout pedestal below pivot */
+const stand = svgEl('g', {});
+stand.appendChild(svgEl('path', {d:'M 450 240 L 424 500 L 476 500 Z', fill:'#8A97AC'}));
+stand.appendChild(svgEl('path', {d:'M 450 240 L 424 500 L 476 500 Z', fill:'none', stroke:'#5D6B82', 'stroke-width':'2.5'}));
+stand.appendChild(svgEl('rect', {x:390, y:495, width:120, height:16, rx:6, fill:'#5D6B82'}));
+svg.appendChild(stand);
+
+/* dial arc (fixed, decorative) mounted above pivot */
+const dial = svgEl('g', {});
+const dialR = 100;
+function dialPt(deg){
+  const rad = deg*Math.PI/180;
+  return {x: PIVOT.x + dialR*Math.sin(rad), y: PIVOT.y - dialR*Math.cos(rad)};
+}
+const arcStart = dialPt(-46), arcEnd = dialPt(46);
+dial.appendChild(svgEl('path', {d:`M ${arcStart.x} ${arcStart.y} A ${dialR} ${dialR} 0 0 1 ${arcEnd.x} ${arcEnd.y}`, fill:'none', stroke:'#D8CFAF', 'stroke-width':'3', opacity:'0.55'}));
+[-40,-20,0,20,40].forEach(d=>{
+  const p1 = dialPt(d);
+  const inner = { x: PIVOT.x + (dialR-10)*Math.sin(d*Math.PI/180), y: PIVOT.y - (dialR-10)*Math.cos(d*Math.PI/180) };
+  dial.appendChild(svgEl('line', {x1:inner.x, y1:inner.y, x2:p1.x, y2:p1.y, stroke: d===0 ? '#3F9A67' : '#B7AE8E', 'stroke-width': d===0?'4':'2.5'}));
+});
+svg.appendChild(dial);
+
+/* pivot cap */
+svg.appendChild(svgEl('circle', {cx:PIVOT.x, cy:PIVOT.y, r:10, fill:'#5D6B82'}));
+
+/* needle (rotating) */
+const needle = svgEl('line', {x1:0, y1:0, x2:0, y2:-NEEDLE_LEN, stroke:'#D9534F', 'stroke-width':'3', 'stroke-linecap':'round'});
+const needleGroup = svgEl('g', {transform:`translate(${PIVOT.x},${PIVOT.y})`});
+needleGroup.appendChild(needle);
+svg.appendChild(needleGroup);
+svg.appendChild(svgEl('circle', {cx:PIVOT.x, cy:PIVOT.y, r:5, fill:'#B4812A'}));
+
+/* beam bar (rotating), drawn symmetric around local origin for fill-box rotation */
+const beamBar = svgEl('g', {transform:`translate(${PIVOT.x},${PIVOT.y})`});
+const beamRect = svgEl('rect', {x:-HALF_LEN-16, y:-8, width:(HALF_LEN*2+32), height:16, rx:8, fill:'#8A97AC', stroke:'#5D6B82', 'stroke-width':'2'});
+beamBar.appendChild(beamRect);
+svg.appendChild(beamBar);
+
+/* pan groups: post + platform + blocks, translate-only so pans stay level */
+function buildPanGroup(){
+  const g = svgEl('g', {});
+  // post (fixed local geometry: from beam attach (0,POST_H) up to pan (0,0))
+  g.appendChild(svgEl('line', {x1:0, y1:POST_H, x2:0, y2:6, stroke:'#8A97AC', 'stroke-width':'6', 'stroke-linecap':'round'}));
+  g.appendChild(svgEl('line', {x1:-30, y1:14, x2:30, y2:14, stroke:'#5D6B82', 'stroke-width':'4', 'stroke-linecap':'round'}));
+  g.appendChild(svgEl('line', {x1:-30, y1:14, x2:0, y2:2, stroke:'#5D6B82', 'stroke-width':'3'}));
+  g.appendChild(svgEl('line', {x1:30, y1:14, x2:0, y2:2, stroke:'#5D6B82', 'stroke-width':'3'}));
+  // pan platform (flat dish)
+  g.appendChild(svgEl('ellipse', {cx:0, cy:0, rx:64, ry:14, fill:'#F3D693', stroke:'#B4812A', 'stroke-width':'2.5'}));
+  g.appendChild(svgEl('path', {d:'M -64 0 Q 0 20 64 0 L 60 6 Q 0 24 -60 6 Z', fill:'#E0B15C', stroke:'#B4812A', 'stroke-width':'1.5'}));
+  const blocksAbove = svgEl('g', {class:'blocks-above'});
+  const blocksBelow = svgEl('g', {class:'blocks-below'});
+  g.appendChild(blocksAbove);
+  g.appendChild(blocksBelow);
+  return {group:g, above:blocksAbove, below:blocksBelow};
+}
+const leftPan = buildPanGroup();
+const rightPan = buildPanGroup();
+svg.appendChild(leftPan.group);
+svg.appendChild(rightPan.group);
+
+/* side labels */
+function makeLabel(txt){
+  const t = svgEl('text', {x:0, y:38, 'text-anchor':'middle', 'font-family':"'M PLUS Rounded 1c'", 'font-size':'15', fill:'#66738F', 'font-weight':'700'});
+  t.textContent = txt;
+  return t;
+}
+const leftLabel = makeLabel('左の皿');
+const rightLabel = makeLabel('右の皿');
+svg.appendChild(leftLabel);
+svg.appendChild(rightLabel);
+
+/* ============ BLOCK DRAWING ============ */
+function makeBlock(x, y, kind, label, badge){
+  const g = svgEl('g', {transform:`translate(${x},${y})`});
+  let fill, stroke;
+  if(kind === 'x'){ fill = '#7C6CF0'; stroke = '#5A48C9'; }
+  else if(kind === 'num'){ fill = '#E0B15C'; stroke = '#B4812A'; }
+  else { fill = '#F0837A'; stroke = '#D9534F'; }
+  g.appendChild(svgEl('rect', {x:-26, y:-26, width:52, height:52, rx:12, fill, stroke, 'stroke-width':'2.5'}));
+  const t = svgEl('text', {x:0, y:6, 'text-anchor':'middle', 'font-family':"'M PLUS Rounded 1c'", 'font-weight':'800', 'font-size': (label.length>3?'14':'18'), fill:'#fff'});
+  t.textContent = label;
+  g.appendChild(t);
+  if(badge){
+    const bt = svgEl('text', {x:0, y:-33, 'text-anchor':'middle', 'font-family':"'M PLUS Rounded 1c'", 'font-weight':'700', 'font-size':'13', fill:'#6B4423'});
+    bt.textContent = badge;
+    g.appendChild(bt);
+  }
+  return g;
+}
+
+function fillPanBlocks(panRefs, items){
+  clearGroup(panRefs.above);
+  clearGroup(panRefs.below);
+  let ai = 0;
+  items.above.forEach(item=>{
+    const y = -34 - ai*56;
+    panRefs.above.appendChild(makeBlock(0, y, item.kind, item.label, item.badge));
+    ai++;
+  });
+  let bi = 0;
+  items.below.forEach(item=>{
+    const y = 40 + bi*54;
+    panRefs.below.appendChild(svgEl('line', {x1:0, y1: bi===0?10:(40+(bi-1)*54+26), x2:0, y2:y-26, stroke:'#D9534F', 'stroke-width':'2', 'stroke-dasharray':'3,3'}));
+    panRefs.below.appendChild(makeBlock(0, y, 'neg', item.label, null));
+    bi++;
+  });
+}
+
+/* ============ MATH STATE ============ */
+const problems = [
+  {tier:'★1 きほん', label:'x + 3 = 7', stars:1, coeffNum:1, coeffDen:1, leftConst:3, rightConst:7, xValue:4, hint:'両辺から 3 をひいてみよう。'},
+  {tier:'★1 きほん', label:'x − 4 = 2', stars:1, coeffNum:1, coeffDen:1, leftConst:-4, rightConst:2, xValue:6, hint:'両辺に 4 をたしてみよう。'},
+  {tier:'★1 きほん', label:'x + 6 = 9', stars:1, coeffNum:1, coeffDen:1, leftConst:6, rightConst:9, xValue:3, hint:'両辺から 6 をひいてみよう。'},
+  {tier:'★2 マイナスに挑戦', label:'x + 5 = 2', stars:2, coeffNum:1, coeffDen:1, leftConst:5, rightConst:2, xValue:-3, hint:'両辺から 5 をひいてみよう。答えはマイナスになるよ。'},
+  {tier:'★2 マイナスに挑戦', label:'x − 6 = −2', stars:2, coeffNum:1, coeffDen:1, leftConst:-6, rightConst:-2, xValue:4, hint:'両辺に 6 をたしてみよう。'},
+  {tier:'★2 マイナスに挑戦', label:'3x = 12', stars:2, coeffNum:3, coeffDen:1, leftConst:0, rightConst:12, xValue:4, hint:'両辺を 3 でわってみよう。'},
+  {tier:'★3 かけ算・わり算', label:'x ÷ 4 = 3', stars:3, coeffNum:1, coeffDen:4, leftConst:0, rightConst:3, xValue:12, hint:'両辺に 4 をかけてみよう。'},
+  {tier:'★3 かけ算・わり算', label:'5x = −15', stars:3, coeffNum:5, coeffDen:1, leftConst:0, rightConst:-15, xValue:-3, hint:'両辺を 5 でわってみよう。答えはマイナスになるよ。'},
+  {tier:'★3 かけ算・わり算', label:'2x + 3 = 11', stars:3, coeffNum:2, coeffDen:1, leftConst:3, rightConst:11, xValue:4, hint:'まず両辺から 3 をひいて、それから 2 でわろう。'},
+  {tier:'★4 2段階チャレンジ', label:'4x − 5 = 7', stars:4, coeffNum:4, coeffDen:1, leftConst:-5, rightConst:7, xValue:3, hint:'まず両辺に 5 をたして、それから 4 でわろう。'},
+  {tier:'★4 2段階チャレンジ', label:'3x + 8 = 2', stars:4, coeffNum:3, coeffDen:1, leftConst:8, rightConst:2, xValue:-2, hint:'まず両辺から 8 をひいて、それから 3 でわろう。答えはマイナスになるよ。'},
+  {tier:'★4 2段階チャレンジ', label:'x ÷ 3 − 1 = 1', stars:4, coeffNum:1, coeffDen:3, leftConst:-1, rightConst:1, xValue:6, hint:'まず両辺に 1 をたして、それから 3 をかけよう。'}
+];
+
+let state = {};
+let solvedSet = new Set();
+let celebrated = false;
+let currentDeg = 0;
+let rafId = null;
+
+function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ [a,b]=[b, a%b]; } return a||1; }
+function simplify(){ const g = gcd(state.coeffNum, state.coeffDen); if(g>1){ state.coeffNum/=g; state.coeffDen/=g; } }
+
+function snapshot(note, isExp){
+  return {coeffNum:state.coeffNum, coeffDen:state.coeffDen, leftConst:state.leftConst, rightConst:state.rightConst, note, isExp: !!isExp};
+}
+
+function loadProblem(i){
+  const p = problems[i];
+  state = {idx:i, coeffNum:p.coeffNum, coeffDen:p.coeffDen, leftConst:p.leftConst, rightConst:p.rightConst, xValue:p.xValue, history:[]};
+  state.history.push(snapshot('はじめの式', false));
+  celebrated = false;
+  document.getElementById('hintBox').classList.remove('show');
+  document.getElementById('hintBox').textContent = p.hint;
+  document.getElementById('solvedBanner').classList.remove('show');
+  renderProblemChips();
+  renderStateChange();
+}
+
+/* ============ FORMATTING ============ */
+function formatLeftExpr(coeffNum, coeffDen, leftConst){
+  let xTerm = '';
+  if(coeffNum !== 0){
+    if(coeffDen === 1) xTerm = (coeffNum === 1) ? 'x' : `${coeffNum}x`;
+    else xTerm = (coeffNum === 1) ? `x÷${coeffDen}` : `${coeffNum}x÷${coeffDen}`;
+  }
+  let cTerm = '';
+  if(leftConst > 0) cTerm = (xTerm ? ` + ${leftConst}` : `${leftConst}`);
+  else if(leftConst < 0) cTerm = (xTerm ? ` − ${Math.abs(leftConst)}` : `−${Math.abs(leftConst)}`);
+  return xTerm + cTerm;
+}
+function formatEquation(){ return `${formatLeftExpr(state.coeffNum, state.coeffDen, state.leftConst)} = ${state.rightConst}`; }
+
+/* ============ PHYSICS ============ */
+function computeMasses(){
+  const leftMass = (state.coeffNum/state.coeffDen)*state.xValue + state.leftConst;
+  const rightMass = state.rightConst;
+  return {leftMass, rightMass};
+}
+function computeTiltTarget(){
+  const {leftMass, rightMass} = computeMasses();
+  const diff = rightMass - leftMass;
+  let deg = diff * 3;
+  if(deg > 20) deg = 20;
+  if(deg < -20) deg = -20;
+  return deg;
+}
+
+/* ============ PAINT (called every animation frame) ============ */
+function paintAngle(deg){
+  beamRect.parentNode.setAttribute('transform', `translate(${PIVOT.x},${PIVOT.y}) rotate(${deg})`);
+
+  const needleDeg = Math.max(-48, Math.min(48, deg*2.1));
+  needleGroup.setAttribute('transform', `translate(${PIVOT.x},${PIVOT.y}) rotate(${needleDeg})`);
+
+  const rad = deg*Math.PI/180;
+  const leftEndX = PIVOT.x - HALF_LEN*Math.cos(rad);
+  const leftEndY = PIVOT.y - HALF_LEN*Math.sin(rad);
+  const rightEndX = PIVOT.x + HALF_LEN*Math.cos(rad);
+  const rightEndY = PIVOT.y + HALF_LEN*Math.sin(rad);
+
+  const leftPanX = leftEndX, leftPanY = leftEndY - POST_H;
+  const rightPanX = rightEndX, rightPanY = rightEndY - POST_H;
+
+  leftPan.group.setAttribute('transform', `translate(${leftPanX},${leftPanY})`);
+  rightPan.group.setAttribute('transform', `translate(${rightPanX},${rightPanY})`);
+  leftLabel.setAttribute('transform', `translate(${leftPanX},${leftPanY})`);
+  rightLabel.setAttribute('transform', `translate(${rightPanX},${rightPanY})`);
+}
+
+function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
+
+function animateTilt(target){
+  if(rafId) cancelAnimationFrame(rafId);
+  const start = currentDeg;
+  const duration = 650;
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min(1, (now-t0)/duration);
+    const eased = easeOutCubic(t);
+    const deg = start + (target-start)*eased;
+    paintAngle(deg);
+    if(t < 1){ rafId = requestAnimationFrame(step); }
+    else { currentDeg = target; rafId = null; }
+  }
+  rafId = requestAnimationFrame(step);
+}
+
+/* ============ RENDER ============ */
+function rebuildBlocks(){
+  const leftItems = {above:[], below:[]};
+  if(state.coeffDen === 1 && state.coeffNum > 0){
+    if(state.coeffNum <= 4){ for(let i=0;i<state.coeffNum;i++) leftItems.above.push({kind:'x', label:'x'}); }
+    else leftItems.above.push({kind:'x', label:'x', badge:`×${state.coeffNum}`});
+  } else if(state.coeffDen > 1){
+    const lbl = state.coeffNum === 1 ? `x÷${state.coeffDen}` : `${state.coeffNum}x÷${state.coeffDen}`;
+    leftItems.above.push({kind:'x', label:lbl});
+  }
+  if(state.leftConst > 0) leftItems.above.push({kind:'num', label:`${state.leftConst}`});
+  else if(state.leftConst < 0) leftItems.below.push({kind:'neg', label:`${state.leftConst}`});
+
+  const rightItems = {above:[], below:[]};
+  if(state.rightConst > 0) rightItems.above.push({kind:'num', label:`${state.rightConst}`});
+  else if(state.rightConst < 0) rightItems.below.push({kind:'neg', label:`${state.rightConst}`});
+
+  fillPanBlocks(leftPan, leftItems);
+  fillPanBlocks(rightPan, rightItems);
+}
+
+function renderEquationText(){
+  const parts = formatEquation().split(' = ');
+  document.getElementById('eqDisplay').innerHTML =
+    `<span class="x-part">${parts[0]}</span><span class="eq-sign">=</span><span>${parts[1]}</span>`;
+}
+
+function renderHistory(){
+  const ul = document.getElementById('historyList');
+  ul.innerHTML = '';
+  state.history.forEach(h=>{
+    const li = document.createElement('li');
+    if(h.isExp) li.classList.add('exp');
+    const eq = document.createElement('div');
+    eq.className = 'heq';
+    eq.textContent = `${formatLeftExpr(h.coeffNum, h.coeffDen, h.leftConst)} = ${h.rightConst}`;
+    const note = document.createElement('div');
+    note.className = 'hnote';
+    note.textContent = h.note;
+    li.appendChild(eq); li.appendChild(note);
+    ul.appendChild(li);
+  });
+  ul.scrollTop = ul.scrollHeight;
+}
+
+function renderProblemChips(){
+  const wrap = document.getElementById('problemChips');
+  wrap.innerHTML = '';
+  let lastTier = null;
+  problems.forEach((p,i)=>{
+    if(p.tier !== lastTier){
+      const tl = document.createElement('div');
+      tl.className = 'tier-label';
+      tl.style.flexBasis = '100%';
+      tl.textContent = p.tier;
+      wrap.appendChild(tl);
+      lastTier = p.tier;
+    }
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (i===state.idx ? ' active':'') + (solvedSet.has(i) ? ' solved':'');
+    chip.innerHTML = `${p.label}<span class="stars">${'★'.repeat(Math.min(p.stars,4))}</span>`;
+    chip.onclick = ()=> loadProblem(i);
+    wrap.appendChild(chip);
+  });
+}
+
+function checkSolved(){
+  const isSolved = (state.coeffNum === 1 && state.coeffDen === 1 && state.leftConst === 0);
+  const banner = document.getElementById('solvedBanner');
+  if(isSolved){
+    solvedSet.add(state.idx);
+    if(!celebrated){
+      celebrated = true;
+      banner.textContent = `🎉 せいかい！ x = ${state.rightConst}`;
+      banner.classList.add('show');
+      renderProblemChips();
+    }
+  } else banner.classList.remove('show');
+}
+
+/* full re-render after state changes (blocks + equation text + history + status + animate tilt) */
+function renderStateChange(){
+  rebuildBlocks();
+  renderEquationText();
+  renderHistory();
+  const target = computeTiltTarget();
+  animateTilt(target);
+  const statusEl = document.getElementById('statusBadge');
+  if(Math.abs(target) < 0.6){ statusEl.textContent = '⚖️ つりあっている'; statusEl.className = 'status-badge status-balanced'; }
+  else { statusEl.textContent = '⚠️ かたむいている！'; statusEl.className = 'status-badge status-tilt'; }
+  checkSolved();
+}
+
+/* ============ TOAST ============ */
+let toastTimer = null;
+function showToast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+
+/* ============ OPERATIONS ============ */
+function currentMode(){ return document.getElementById('modeSwitch').checked ? 'experiment' : 'safe'; }
+function currentSide(){ const r = document.querySelector('input[name="side"]:checked'); return r ? r.value : 'left'; }
+
+function applyOp(op){
+  const n = parseInt(document.getElementById('opN').value, 10);
+  if(!n || n < 1){ showToast('1以上の数を入力してね', 'warn'); return; }
+
+  const mode = currentMode();
+  const side = mode === 'safe' ? 'both' : currentSide();
+  const opLabels = {add:'たす', sub:'ひく', mul:'かける', div:'わる'};
+
+  if(op === 'div'){
+    const checkLeft = (side==='both' || side==='left');
+    const checkRight = (side==='both' || side==='right');
+    if(checkLeft && state.leftConst % n !== 0){ showToast(`${n} では左がわがわりきれないよ`, 'warn'); return; }
+    if(checkRight && state.rightConst % n !== 0){ showToast(`${n} では右がわがわりきれないよ`, 'warn'); return; }
+  }
+
+  if(op === 'add'){
+    if(side==='both'||side==='left') state.leftConst += n;
+    if(side==='both'||side==='right') state.rightConst += n;
+  } else if(op === 'sub'){
+    if(side==='both'||side==='left') state.leftConst -= n;
+    if(side==='both'||side==='right') state.rightConst -= n;
+  } else if(op === 'mul'){
+    if(side==='both'||side==='left'){ state.coeffNum *= n; state.leftConst *= n; }
+    if(side==='both'||side==='right') state.rightConst *= n;
+    if(side==='both') simplify();
+  } else if(op === 'div'){
+    if(side==='both'||side==='left'){ state.coeffDen *= n; state.leftConst /= n; }
+    if(side==='both'||side==='right') state.rightConst /= n;
+    if(side==='both') simplify();
+  }
+
+  let note;
+  if(side === 'both'){
+    if(op==='mul') note = `両辺を ${n} 倍した`;
+    else if(op==='div') note = `両辺を ${n} でわった`;
+    else if(op==='add') note = `両辺に ${n} をたした`;
+    else note = `両辺から ${n} をひいた`;
+  } else {
+    const sideLabel = side==='left' ? '左の皿' : '右の皿';
+    note = `⚠ ${sideLabel}だけ ${n} を${opLabels[op]}た（実験）`;
+    showToast('片方だけ操作したから、てんびんが傾いたよ！', 'warn');
+  }
+
+  state.history.push(snapshot(note, side !== 'both'));
+  renderStateChange();
+}
+
+function undo(){
+  if(state.history.length <= 1) return;
+  state.history.pop();
+  const last = state.history[state.history.length-1];
+  state.coeffNum = last.coeffNum; state.coeffDen = last.coeffDen;
+  state.leftConst = last.leftConst; state.rightConst = last.rightConst;
+  celebrated = false;
+  renderStateChange();
+}
+function resetProblem(){ loadProblem(state.idx); }
+
+/* ============ WIRE UP ============ */
+document.getElementById('opGrid').addEventListener('click', e=>{
+  const btn = e.target.closest('.op-btn');
+  if(btn) applyOp(btn.dataset.op);
+});
+document.getElementById('undoBtn').onclick = undo;
+document.getElementById('resetBtn').onclick = resetProblem;
+document.getElementById('nMinus').onclick = ()=>{ const el = document.getElementById('opN'); el.value = Math.max(1, parseInt(el.value||1,10)-1); };
+document.getElementById('nPlus').onclick = ()=>{ const el = document.getElementById('opN'); el.value = Math.min(20, parseInt(el.value||1,10)+1); };
+document.getElementById('hintBtn').onclick = ()=>{ document.getElementById('hintBox').classList.toggle('show'); };
+
+const modeSwitch = document.getElementById('modeSwitch');
+const opGrid = document.getElementById('opGrid');
+const sidePicker = document.getElementById('sidePicker');
+const modeLabel = document.getElementById('modeLabel');
+modeSwitch.addEventListener('change', ()=>{
+  if(modeSwitch.checked){
+    opGrid.classList.add('experiment');
+    sidePicker.classList.add('show');
+    modeLabel.innerHTML = '実験モード<small>かたほうだけ操作する（てんびんが傾くよ）</small>';
+  } else {
+    opGrid.classList.remove('experiment');
+    sidePicker.classList.remove('show');
+    modeLabel.innerHTML = '両辺モード<small>両辺に同じ操作をする（安全）</small>';
+  }
+});
+
+/* ============ INIT ============ */
+paintAngle(0);
+loadProblem(0);
+</script>
+</body>
+</html>
